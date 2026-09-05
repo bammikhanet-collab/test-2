@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>PRESENT SIMPLE ADVENTURE: EVERY DAY MISSION!</title>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div id="game">
+
+  <!-- =========================
+       TOP GAME HUD
+  ========================== -->
+
+  <header id="hud">
+
+```
+<div class="hud-item score-box">
+  🏆 <span>SCORE:</span>
+  <strong id="score">0</strong>
+</div>
+
+<div class="hud-item">
+  ⭐ <strong id="stars">0</strong>
+</div>
+
+<div class="hud-item crystal-box">
+  <span class="crystal inactive" id="crystal1">💎</span>
+  <span class="crystal inactive" id="crystal2">💎</span>
+  <span class="crystal inactive" id="crystal3">💎</span>
+  <span class="crystal inactive" id="crystal4">💎</span>
+  <span class="crystal inactive" id="crystal5">💎</span>
+</div>
+
+<div class="hud-item timer-box">
+  ⏱ <span id="timer">02:00</span>
+</div>
+
+<div class="hud-buttons">
+  <button id="soundBtn" class="icon-btn">🔊</button>
+  <button id="pauseBtn" class="icon-btn">⏸</button>
+  <button id="restartBtn" class="icon-btn">🔄</button>
+  <button id="homeBtn" class="icon-btn">🏠</button>
+</div>
+```
+
+  </header>
+
+  <!-- =========================
+       SCREEN 1 : WELCOME
+  ========================== -->
+
+  <section id="welcome" class="screen active welcome-bg">
+
+```
+<div class="hero-content">
+
+  <div class="title-card">
+
+    <h1>PRESENT SIMPLE<br>ADVENTURE</h1>
+
+    <h2>Every Day Mission!</h2>
+
+    <div class="big-crystal">💎</div>
+
+    <button class="main-btn" onclick="showScreen('story')">
+      START GAME 🚀
+    </button>
+
+  </div>
+
+</div>
+```
+
+  </section>
+
+  <!-- =========================
+       SCREEN 2 : STORY
+  ========================== -->
+
+  <section id="story" class="screen story-bg">
+
+```
+<div class="characters">
+
+  <div class="character-card">
+    <div class="avatar">👧</div>
+    <h3>Mia</h3>
+  </div>
+
+  <div class="dialogue">
+
+    <p>👋 Hello, Explorer!</p>
+
+    <p>Welcome to <strong>Every Day Town!</strong></p>
+
+    <p>
+      The magical <strong>Time Crystals</strong>
+      have disappeared!
+    </p>
+
+    <p>
+      Complete <strong>5 missions</strong>
+      and collect all the crystals!
+    </p>
+
+    <button class="main-btn" onclick="startLevel(1)">
+      LET'S GO! ⭐
+    </button>
+
+  </div>
+
+  <div class="character-card">
+    <div class="avatar">👦</div>
+    <h3>Max</h3>
+  </div>
+
+</div>
+
+<div class="mission-map">
+
+  <div class="mission-node">1<br>🌅<br>Daily Routine</div>
+  <div class="mission-node">2<br>🏫<br>School</div>
+  <div class="mission-node">3<br>⚡<br>Verb Power</div>
+  <div class="mission-node">4<br>❓<br>Do / Does</div>
+  <div class="mission-node">5<br>🌳<br>Frequency Forest</div>
+  <div class="mission-node">🏰<br>Crystal Castle</div>
+
+</div>
+```
+
+  </section>
+
+  <!-- =========================
+       LEVEL 1
+  ========================== -->
+
+  <section id="level1" class="screen level1-bg">
+
+```
+<div class="level-card">
+
+  <h2>🌅 LEVEL 1: DAILY ROUTINE</h2>
+
+  <p class="instruction">
+    Drag or click the activities in the correct order!
+  </p>
+
+  <div id="routineCards" class="routine-cards">
+
+    <div class="routine-card" data-order="1">
+      🌞
+      <span>Get up</span>
+    </div>
+
+    <div class="routine-card" data-order="2">
+      🪥
+      <span>Brush my teeth</span>
+    </div>
+
+    <div class="routine-card" data-order="3">
+      🍳
+      <span>Have breakfast</span>
+    </div>
+
+    <div class="routine-card" data-order="4">
+      🏫
+      <span>Go to school</span>
+    </div>
+
+    <div class="routine-card" data-order="5">
+      ⚽
+      <span>Play football</span>
+    </div>
+
+    <div class="routine-card" data-order="6">
+      🌙
+      <span>Go to bed</span>
+    </div>
+
+  </div>
+
+  <div class="answer-order" id="routineAnswer"></div>
+
+  <button class="main-btn small-btn" onclick="checkRoutine()">
+    CHECK ANSWER
+  </button>
+
+</div>
+```
+
+  </section>
+
+  <!-- =========================
+       LEVEL 2
+  ========================== -->
+
+  <section id="level2" class="screen level2-bg">
+
+```
+<div class="quiz-card">
+
+  <h2>🏫 LEVEL 2: SCHOOL CHALLENGE</h2>
+
+  <div id="schoolQuestion"></div>
+
+  <div id="schoolAnswers" class="answer-buttons"></div>
+
+</div>
+```
+
+  </section>
+
+  <!-- =========================
+       LEVEL 3
+  ========================== -->
+
+  <section id="level3" class="screen level3-bg">
+
+```
+<div class="quiz-card">
+
+  <h2>⚡ LEVEL 3: VERB POWER</h2>
+
+  <div class="football-scene">
+
+    <div id="player">⚽</div>
+
+    <div class="goal">🥅</div>
+
+  </div>
+
+  <div id="verbQuestion"></div>
+
+  <div id="verbAnswers" class="answer-buttons"></div>
+
+  <div class="grammar-tip">
+    <strong>HE / SHE / IT</strong>
+    ➜ VERB + <strong>S / ES</strong>
+  </div>
+
+</div>
+```
+
+  </section>
+
+  <!-- =========================
+       LEVEL 4
+  ========================== -->
+
+  <section id="level4" class="screen level4-bg">
+
+```
+<div class="quiz-card">
+
+  <h2>❓ LEVEL 4: DO OR DOES?</h2>
+
+  <div id="doQuestion"></div>
+
+  <div id="doAnswers" class="answer-buttons"></div>
+
+  <div class="grammar-tip">
+
+    <strong>DO</strong> → I / YOU / WE / THEY
+
+    <br>
+
+    <strong>DOES</strong> → HE / SHE / IT
+
+  </div>
+
+</div>
+```
+
+  </section>
+
+  <!-- =========================
+       LEVEL 5
+  ========================== -->
+
+  <section id="level5" class="screen level5-bg">
+
+```
+<div class="quiz-card">
+
+  <h2>🌳 LEVEL 5: FREQUENCY FOREST</h2>
+
+  <div class="frequency-meter">
+
+    <div>🌟 ALWAYS<br>100%</div>
+    <div>😊 USUALLY<br>Often</div>
+    <div>🎲 SOMETIMES<br>Sometimes</div>
+    <div>🚫 NEVER<br>0%</div>
+
+  </div>
+
+  <div id="frequencyQuestion"></div>
+
+  <div id="frequencyAnswers" class="answer-buttons"></div>
+
+</div>
+```
+
+  </section>
+
+  <!-- =========================
+       FINAL LEVEL
+  ========================== -->
+
+  <section id="finalLevel" class="screen castle-bg">
+
+```
+<div class="castle-card">
+
+  <h2>🏰 CRYSTAL CASTLE</h2>
+
+  <p>
+    The five Time Crystals unlock the castle!
+  </p>
+
+  <div class="castle-crystals">
+    💎 💎 💎 💎 💎
+  </div>
+
+  <div id="finalQuestion"></div>
+
+  <div id="finalAnswers" class="answer-buttons"></div>
+
+</div>
+```
+
+  </section>
+
+  <!-- =========================
+       RESULT SCREEN
+  ========================== -->
+
+  <section id="result" class="screen result-bg">
+
+```
+<div class="result-card">
+
+  <div class="celebration">🎉✨🎊</div>
+
+  <h1>CONGRATULATIONS!</h1>
+
+  <h2>You saved Every Day Town!</h2>
+
+  <div class="result-score">
+
+    <p>
+      🏆 YOUR SCORE:
+      <strong id="finalScore">0</strong>
+    </p>
+
+    <p>
+      ⭐ STARS EARNED:
+      <strong id="finalStars">0</strong>
+    </p>
+
+  </div>
+
+  <h2 class="hero-text">
+    🦸 YOU ARE A<br>
+    PRESENT SIMPLE HERO!
+  </h2>
+
+  <button class="main-btn" onclick="restartGame()">
+    PLAY AGAIN 🔄
+  </button>
+
+  <button class="secondary-btn" onclick="goHome()">
+    HOME 🏠
+  </button>
+
+</div>
+```
+
+  </section>
+
+  <!-- =========================
+       FEEDBACK POPUP
+  ========================== -->
+
+  <div id="feedback" class="feedback">
+
+```
+<div id="feedbackText"></div>
+```
+
+  </div>
+
+  <!-- =========================
+       PAUSE OVERLAY
+  ========================== -->
+
+  <div id="pauseOverlay" class="pause-overlay">
+
+```
+<div class="pause-card">
+
+  <h2>⏸ GAME PAUSED</h2>
+
+  <button class="main-btn" onclick="resumeGame()">
+    CONTINUE ▶
+  </button>
+
+</div>
+```
+
+  </div>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
