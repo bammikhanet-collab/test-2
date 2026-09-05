@@ -1,0 +1,1464 @@
+/* =====================================
+PRESENT SIMPLE ADVENTURE
+GAME JAVASCRIPT
+===================================== */
+
+/* =====================================
+GAME STATE
+===================================== */
+
+let score = 0;
+let stars = 0;
+
+let crystals = [false, false, false, false, false];
+
+let currentLevel = 0;
+
+let timeRemaining = 120;
+
+let timerInterval = null;
+
+let gamePaused = false;
+
+let soundEnabled = true;
+
+/* =====================================
+QUESTION INDEXES
+===================================== */
+
+let schoolIndex = 0;
+let verbIndex = 0;
+let doIndex = 0;
+let frequencyIndex = 0;
+let finalIndex = 0;
+
+/* =====================================
+LEVEL DATA
+===================================== */
+
+const schoolQuestions = [
+
+{
+question: "She ______ football.",
+answers: ["play", "plays", "playing"],
+correct: "plays"
+},
+
+{
+question: "He ______ to school every day.",
+answers: ["go", "goes", "going"],
+correct: "goes"
+},
+
+{
+question: "They ______ breakfast in the morning.",
+answers: ["have", "has", "having"],
+correct: "have"
+},
+
+{
+question: "My mother ______ coffee every morning.",
+answers: ["drink", "drinks", "drinking"],
+correct: "drinks"
+}
+
+];
+
+const verbQuestions = [
+
+{
+question: "He ______ football every day.",
+answers: ["play", "plays", "playing"],
+correct: "plays"
+},
+
+{
+question: "She ______ TV after school.",
+answers: ["watch", "watches", "watching"],
+correct: "watches"
+},
+
+{
+question: "The cat ______ milk.",
+answers: ["drink", "drinks", "drinking"],
+correct: "drinks"
+}
+
+];
+
+const doQuestions = [
+
+{
+question: "Does the dog like bones?",
+answers: [
+"YES, IT DOES.",
+"NO, IT DOESN'T."
+],
+correct: "YES, IT DOES."
+},
+
+{
+question: "Do you play football?",
+answers: [
+"YES, I DO.",
+"NO, I DON'T."
+],
+correct: "YES, I DO."
+},
+
+{
+question: "Does he go to school every day?",
+answers: [
+"YES, HE DOES.",
+"NO, HE DOESN'T."
+],
+correct: "YES, HE DOES."
+},
+
+{
+question: "Does she like ice cream?",
+answers: [
+"YES, SHE DOES.",
+"NO, SHE DOESN'T."
+],
+correct: "YES, SHE DOES."
+}
+
+];
+
+const frequencyQuestions = [
+
+{
+question: "I ______ brush my teeth in the morning.",
+answers: [
+"Always",
+"Usually",
+"Sometimes",
+"Never"
+],
+correct: "Always"
+},
+
+{
+question: "She ______ watches TV after dinner.",
+answers: [
+"Always",
+"Usually",
+"Sometimes",
+"Never"
+],
+correct: "Usually"
+},
+
+{
+question: "They ______ play outside.",
+answers: [
+"Always",
+"Usually",
+"Sometimes",
+"Never"
+],
+correct: "Sometimes"
+},
+
+{
+question: "I ______ eat breakfast at midnight.",
+answers: [
+"Always",
+"Usually",
+"Sometimes",
+"Never"
+],
+correct: "Never"
+}
+
+];
+
+const finalQuestions = [
+
+{
+question: "They ______ football.",
+answers: [
+"plays",
+"play",
+"playing"
+],
+correct: "play"
+},
+
+{
+question: "She ______ to school every day.",
+answers: [
+"go",
+"goes",
+"going"
+],
+correct: "goes"
+},
+
+{
+question: "______ you like English?",
+answers: [
+"Do",
+"Does",
+"Are"
+],
+correct: "Do"
+},
+
+{
+question: "______ he play football?",
+answers: [
+"Do",
+"Does",
+"Is"
+],
+correct: "Does"
+},
+
+{
+question: "Does she like cats?",
+answers: [
+"Yes, she does.",
+"Yes, she do.",
+"Yes, she is."
+],
+correct: "Yes, she does."
+}
+
+];
+
+/* =====================================
+SCREEN MANAGEMENT
+===================================== */
+
+function showScreen(screenId) {
+
+document.querySelectorAll(".screen")
+.forEach(screen => {
+
+```
+  screen.classList.remove("active");
+
+});
+```
+
+const selectedScreen =
+document.getElementById(screenId);
+
+if (selectedScreen) {
+
+```
+selectedScreen.classList.add("active");
+```
+
+}
+
+}
+
+/* =====================================
+START LEVEL
+===================================== */
+
+function startLevel(level) {
+
+currentLevel = level;
+
+timeRemaining = 120;
+
+startTimer();
+
+if (level === 1) {
+
+```
+showScreen("level1");
+```
+
+}
+
+if (level === 2) {
+
+```
+showScreen("level2");
+
+schoolIndex = 0;
+
+loadSchoolQuestion();
+```
+
+}
+
+if (level === 3) {
+
+```
+showScreen("level3");
+
+verbIndex = 0;
+
+loadVerbQuestion();
+```
+
+}
+
+if (level === 4) {
+
+```
+showScreen("level4");
+
+doIndex = 0;
+
+loadDoQuestion();
+```
+
+}
+
+if (level === 5) {
+
+```
+showScreen("level5");
+
+frequencyIndex = 0;
+
+loadFrequencyQuestion();
+```
+
+}
+
+if (level === 6) {
+
+```
+showScreen("finalLevel");
+
+finalIndex = 0;
+
+loadFinalQuestion();
+```
+
+}
+
+}
+
+/* =====================================
+SCORE
+===================================== */
+
+function updateScore(points) {
+
+score += points;
+
+document.getElementById("score")
+.textContent = score;
+
+}
+
+function addStar(amount = 1) {
+
+stars += amount;
+
+document.getElementById("stars")
+.textContent = stars;
+
+}
+
+/* =====================================
+CRYSTALS
+===================================== */
+
+function collectCrystal(number) {
+
+crystals[number - 1] = true;
+
+const crystal =
+document.getElementById(
+"crystal" + number
+);
+
+crystal.classList.remove("inactive");
+
+crystal.classList.add("active");
+
+showFeedback(
+"💎 TIME CRYSTAL " +
+number +
+" COLLECTED!"
+);
+
+}
+
+/* =====================================
+TIMER
+===================================== */
+
+function startTimer() {
+
+clearInterval(timerInterval);
+
+updateTimerDisplay();
+
+timerInterval = setInterval(() => {
+
+```
+if (!gamePaused) {
+
+  timeRemaining--;
+
+  updateTimerDisplay();
+
+  if (timeRemaining <= 0) {
+
+    clearInterval(timerInterval);
+
+    showFeedback(
+      "⏰ Time's up! Let's try again!"
+    );
+
+    setTimeout(() => {
+
+      restartCurrentLevel();
+
+    }, 1500);
+
+  }
+
+}
+```
+
+}, 1000);
+
+}
+
+function updateTimerDisplay() {
+
+const minutes =
+Math.floor(timeRemaining / 60);
+
+const seconds =
+timeRemaining % 60;
+
+document.getElementById("timer")
+.textContent =
+String(minutes).padStart(2, "0")
++
+":"
++
+String(seconds).padStart(2, "0");
+
+}
+
+/* =====================================
+PAUSE
+===================================== */
+
+document
+.getElementById("pauseBtn")
+.addEventListener("click", pauseGame);
+
+function pauseGame() {
+
+gamePaused = true;
+
+document
+.getElementById("pauseOverlay")
+.classList.add("show");
+
+}
+
+function resumeGame() {
+
+gamePaused = false;
+
+document
+.getElementById("pauseOverlay")
+.classList.remove("show");
+
+}
+
+/* =====================================
+SOUND
+===================================== */
+
+document
+.getElementById("soundBtn")
+.addEventListener("click", toggleSound);
+
+function toggleSound() {
+
+soundEnabled = !soundEnabled;
+
+document
+.getElementById("soundBtn")
+.textContent =
+soundEnabled
+? "🔊"
+: "🔇";
+
+}
+
+/* =====================================
+SIMPLE SOUND EFFECT
+===================================== */
+
+function playTone(frequency = 500) {
+
+if (!soundEnabled) return;
+
+try {
+
+```
+const AudioContext =
+  window.AudioContext ||
+  window.webkitAudioContext;
+
+const audioContext =
+  new AudioContext();
+
+const oscillator =
+  audioContext.createOscillator();
+
+const gain =
+  audioContext.createGain();
+
+oscillator.frequency.value =
+  frequency;
+
+oscillator.connect(gain);
+
+gain.connect(
+  audioContext.destination
+);
+
+oscillator.start();
+
+gain.gain.exponentialRampToValueAtTime(
+  0.00001,
+  audioContext.currentTime + 0.3
+);
+
+oscillator.stop(
+  audioContext.currentTime + 0.3
+);
+```
+
+} catch (error) {
+
+```
+console.log("Sound unavailable");
+```
+
+}
+
+}
+
+/* =====================================
+FEEDBACK
+===================================== */
+
+function showFeedback(text) {
+
+const feedback =
+document.getElementById("feedback");
+
+const feedbackText =
+document.getElementById("feedbackText");
+
+feedbackText.textContent = text;
+
+feedback.classList.add("show");
+
+setTimeout(() => {
+
+```
+feedback.classList.remove("show");
+```
+
+}, 1400);
+
+}
+
+function correctFeedback() {
+
+playTone(800);
+
+showFeedback("⭐ GREAT JOB! ⭐");
+
+}
+
+function wrongFeedback() {
+
+playTone(200);
+
+showFeedback("Try Again! 😊");
+
+}
+
+/* =====================================
+LEVEL 1
+DAILY ROUTINE
+===================================== */
+
+let routineOrder = [];
+
+const routineCards =
+document.querySelectorAll(".routine-card");
+
+routineCards.forEach(card => {
+
+card.addEventListener("click", () => {
+
+```
+const order =
+  card.dataset.order;
+
+if (routineOrder.includes(order)) {
+
+  routineOrder =
+    routineOrder.filter(
+      item => item !== order
+    );
+
+  card.classList.remove("selected");
+
+}
+
+else {
+
+  routineOrder.push(order);
+
+  card.classList.add("selected");
+
+}
+
+updateRoutineDisplay();
+```
+
+});
+
+});
+
+function updateRoutineDisplay() {
+
+const answerBox =
+document.getElementById("routineAnswer");
+
+answerBox.innerHTML = "";
+
+routineOrder.forEach(number => {
+
+```
+const card =
+  document.querySelector(
+    `[data-order="${number}"]`
+  );
+
+const item =
+  document.createElement("div");
+
+item.className = "order-item";
+
+item.textContent =
+  card.querySelector("span").textContent;
+
+answerBox.appendChild(item);
+```
+
+});
+
+}
+
+function checkRoutine() {
+
+const correct =
+["1","2","3","4","5","6"];
+
+if (
+JSON.stringify(routineOrder)
+===
+JSON.stringify(correct)
+) {
+
+```
+updateScore(20);
+
+addStar(3);
+
+collectCrystal(1);
+
+correctFeedback();
+
+setTimeout(() => {
+
+  startLevel(2);
+
+}, 1800);
+```
+
+}
+
+else {
+
+```
+wrongFeedback();
+```
+
+}
+
+}
+
+/* =====================================
+GENERIC QUIZ LOADER
+===================================== */
+
+function loadQuestion(
+questionData,
+questionElement,
+answersElement,
+callback
+) {
+
+document
+.getElementById(questionElement)
+.innerHTML =
+`<div class="question">
+      ${questionData.question}     </div>`;
+
+const answerContainer =
+document.getElementById(answersElement);
+
+answerContainer.innerHTML = "";
+
+questionData.answers
+.forEach(answer => {
+
+```
+  const button =
+    document.createElement("button");
+
+  button.className =
+    "answer-btn";
+
+  button.textContent =
+    answer;
+
+  button.addEventListener(
+    "click",
+    () => callback(
+      answer,
+      questionData.correct,
+      button
+    )
+  );
+
+  answerContainer.appendChild(button);
+
+});
+```
+
+}
+
+/* =====================================
+LEVEL 2
+===================================== */
+
+function loadSchoolQuestion() {
+
+if (
+schoolIndex >=
+schoolQuestions.length
+) {
+
+```
+finishSchoolLevel();
+
+return;
+```
+
+}
+
+loadQuestion(
+
+```
+schoolQuestions[schoolIndex],
+
+"schoolQuestion",
+
+"schoolAnswers",
+
+checkSchoolAnswer
+```
+
+);
+
+}
+
+function checkSchoolAnswer(
+answer,
+correct,
+button
+) {
+
+if (answer === correct) {
+
+```
+button.classList.add("correct");
+
+updateScore(10);
+
+addStar(1);
+
+correctFeedback();
+
+setTimeout(() => {
+
+  schoolIndex++;
+
+  loadSchoolQuestion();
+
+}, 1000);
+```
+
+}
+
+else {
+
+```
+button.classList.add("wrong");
+
+wrongFeedback();
+
+setTimeout(() => {
+
+  button.classList.remove("wrong");
+
+}, 600);
+```
+
+}
+
+}
+
+function finishSchoolLevel() {
+
+updateScore(10);
+
+collectCrystal(2);
+
+showFeedback(
+"💎 MISSION COMPLETE!"
+);
+
+setTimeout(() => {
+
+```
+startLevel(3);
+```
+
+}, 1600);
+
+}
+
+/* =====================================
+LEVEL 3
+===================================== */
+
+function loadVerbQuestion() {
+
+if (
+verbIndex >=
+verbQuestions.length
+) {
+
+```
+finishVerbLevel();
+
+return;
+```
+
+}
+
+loadQuestion(
+
+```
+verbQuestions[verbIndex],
+
+"verbQuestion",
+
+"verbAnswers",
+
+checkVerbAnswer
+```
+
+);
+
+}
+
+function checkVerbAnswer(
+answer,
+correct,
+button
+) {
+
+if (answer === correct) {
+
+```
+button.classList.add("correct");
+
+updateScore(10);
+
+addStar(1);
+
+correctFeedback();
+
+const football =
+  document.getElementById("player");
+
+football.classList.add("kick");
+
+setTimeout(() => {
+
+  football.classList.remove("kick");
+
+  verbIndex++;
+
+  loadVerbQuestion();
+
+}, 1100);
+```
+
+}
+
+else {
+
+```
+button.classList.add("wrong");
+
+wrongFeedback();
+
+setTimeout(() => {
+
+  button.classList.remove("wrong");
+
+}, 600);
+```
+
+}
+
+}
+
+function finishVerbLevel() {
+
+updateScore(10);
+
+collectCrystal(3);
+
+showFeedback(
+"⚡ VERB POWER ACTIVATED!"
+);
+
+setTimeout(() => {
+
+```
+startLevel(4);
+```
+
+}, 1600);
+
+}
+
+/* =====================================
+LEVEL 4
+===================================== */
+
+function loadDoQuestion() {
+
+if (
+doIndex >=
+doQuestions.length
+) {
+
+```
+finishDoLevel();
+
+return;
+```
+
+}
+
+loadQuestion(
+
+```
+doQuestions[doIndex],
+
+"doQuestion",
+
+"doAnswers",
+
+checkDoAnswer
+```
+
+);
+
+}
+
+function checkDoAnswer(
+answer,
+correct,
+button
+) {
+
+if (answer === correct) {
+
+```
+button.classList.add("correct");
+
+updateScore(10);
+
+addStar(1);
+
+correctFeedback();
+
+setTimeout(() => {
+
+  doIndex++;
+
+  loadDoQuestion();
+
+}, 1000);
+```
+
+}
+
+else {
+
+```
+button.classList.add("wrong");
+
+wrongFeedback();
+
+setTimeout(() => {
+
+  button.classList.remove("wrong");
+
+}, 600);
+```
+
+}
+
+}
+
+function finishDoLevel() {
+
+updateScore(10);
+
+collectCrystal(4);
+
+showFeedback(
+"💎 CRYSTAL FOUND!"
+);
+
+setTimeout(() => {
+
+```
+startLevel(5);
+```
+
+}, 1600);
+
+}
+
+/* =====================================
+LEVEL 5
+===================================== */
+
+function loadFrequencyQuestion() {
+
+if (
+frequencyIndex >=
+frequencyQuestions.length
+) {
+
+```
+finishFrequencyLevel();
+
+return;
+```
+
+}
+
+loadQuestion(
+
+```
+frequencyQuestions[frequencyIndex],
+
+"frequencyQuestion",
+
+"frequencyAnswers",
+
+checkFrequencyAnswer
+```
+
+);
+
+}
+
+function checkFrequencyAnswer(
+answer,
+correct,
+button
+) {
+
+if (answer === correct) {
+
+```
+button.classList.add("correct");
+
+updateScore(10);
+
+addStar(1);
+
+correctFeedback();
+
+setTimeout(() => {
+
+  frequencyIndex++;
+
+  loadFrequencyQuestion();
+
+}, 1000);
+```
+
+}
+
+else {
+
+```
+button.classList.add("wrong");
+
+wrongFeedback();
+
+setTimeout(() => {
+
+  button.classList.remove("wrong");
+
+}, 600);
+```
+
+}
+
+}
+
+function finishFrequencyLevel() {
+
+updateScore(10);
+
+collectCrystal(5);
+
+showFeedback(
+"💎 ALL CRYSTALS FOUND!"
+);
+
+setTimeout(() => {
+
+```
+startLevel(6);
+```
+
+}, 1800);
+
+}
+
+/* =====================================
+FINAL LEVEL
+===================================== */
+
+function loadFinalQuestion() {
+
+if (
+finalIndex >=
+finalQuestions.length
+) {
+
+```
+finishGame();
+
+return;
+```
+
+}
+
+loadQuestion(
+
+```
+finalQuestions[finalIndex],
+
+"finalQuestion",
+
+"finalAnswers",
+
+checkFinalAnswer
+```
+
+);
+
+}
+
+function checkFinalAnswer(
+answer,
+correct,
+button
+) {
+
+if (answer === correct) {
+
+```
+button.classList.add("correct");
+
+updateScore(20);
+
+addStar(1);
+
+correctFeedback();
+
+setTimeout(() => {
+
+  finalIndex++;
+
+  loadFinalQuestion();
+
+}, 1000);
+```
+
+}
+
+else {
+
+```
+button.classList.add("wrong");
+
+wrongFeedback();
+
+setTimeout(() => {
+
+  button.classList.remove("wrong");
+
+}, 600);
+```
+
+}
+
+}
+
+/* =====================================
+FINISH GAME
+===================================== */
+
+function finishGame() {
+
+clearInterval(timerInterval);
+
+showScreen("result");
+
+document
+.getElementById("finalScore")
+.textContent =
+score;
+
+document
+.getElementById("finalStars")
+.textContent =
+stars;
+
+}
+
+/* =====================================
+RESTART CURRENT LEVEL
+===================================== */
+
+function restartCurrentLevel() {
+
+if (currentLevel === 1) {
+
+```
+routineOrder = [];
+
+document
+  .querySelectorAll(".routine-card")
+  .forEach(card => {
+
+    card.classList.remove("selected");
+
+  });
+
+updateRoutineDisplay();
+```
+
+}
+
+if (currentLevel === 2) {
+
+```
+schoolIndex = 0;
+
+loadSchoolQuestion();
+```
+
+}
+
+if (currentLevel === 3) {
+
+```
+verbIndex = 0;
+
+loadVerbQuestion();
+```
+
+}
+
+if (currentLevel === 4) {
+
+```
+doIndex = 0;
+
+loadDoQuestion();
+```
+
+}
+
+if (currentLevel === 5) {
+
+```
+frequencyIndex = 0;
+
+loadFrequencyQuestion();
+```
+
+}
+
+if (currentLevel === 6) {
+
+```
+finalIndex = 0;
+
+loadFinalQuestion();
+```
+
+}
+
+timeRemaining = 120;
+
+startTimer();
+
+}
+
+/* =====================================
+RESTART GAME
+===================================== */
+
+function restartGame() {
+
+score = 0;
+
+stars = 0;
+
+crystals =
+[false,false,false,false,false];
+
+currentLevel = 0;
+
+routineOrder = [];
+
+schoolIndex = 0;
+
+verbIndex = 0;
+
+doIndex = 0;
+
+frequencyIndex = 0;
+
+finalIndex = 0;
+
+document
+.getElementById("score")
+.textContent = 0;
+
+document
+.getElementById("stars")
+.textContent = 0;
+
+for (
+let i = 1;
+i <= 5;
+i++
+) {
+
+```
+const crystal =
+  document.getElementById(
+    "crystal" + i
+  );
+
+crystal.classList.remove("active");
+
+crystal.classList.add("inactive");
+```
+
+}
+
+document
+.querySelectorAll(".routine-card")
+.forEach(card => {
+
+```
+  card.classList.remove("selected");
+
+});
+```
+
+updateRoutineDisplay();
+
+clearInterval(timerInterval);
+
+showScreen("welcome");
+
+}
+
+/* =====================================
+HOME
+===================================== */
+
+function goHome() {
+
+clearInterval(timerInterval);
+
+gamePaused = false;
+
+document
+.getElementById("pauseOverlay")
+.classList.remove("show");
+
+showScreen("welcome");
+
+}
+
+/* =====================================
+HUD BUTTONS
+===================================== */
+
+document
+.getElementById("restartBtn")
+.addEventListener(
+"click",
+restartCurrentLevel
+);
+
+document
+.getElementById("homeBtn")
+.addEventListener(
+"click",
+goHome
+);
+
+/* =====================================
+INITIAL SCREEN
+===================================== */
+
+showScreen("welcome");
